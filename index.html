@@ -33,7 +33,68 @@
             background-color: #f8f9fa;
         }
 
+        /* ========== LOGIN PAGE STYLES ========== */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, #3498db, #2c3e50);
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .login-logo i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+        }
+
+        .login-logo h4 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+
+        .login-card .form-control {
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+        }
+
+        .login-card .btn-primary {
+            width: 100%;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            padding: 12px 0;
+            background: linear-gradient(135deg, var(--secondary-color), #74b9ff);
+            border: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .login-card .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
         /* ========== NAVIGATION & LAYOUT ========== */
+        .app-container {
+            display: none;
+        }
+
         .navbar-custom {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -617,66 +678,95 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-fluid">
-            <button class="btn btn-link text-white d-lg-none" id="sidebarToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            <a class="navbar-brand" href="#dashboard">
-                <i class="fas fa-graduation-cap me-2"></i>
-                e-Learning System
-            </a>
-
-            <div class="navbar-nav ms-auto d-flex flex-row">
-                <div class="nav-item dropdown me-3">
-                    <div class="notification-bell" id="notificationBell">
-                        <i class="fas fa-bell text-white fs-5"></i>
-                        <span class="notification-count" id="notificationCount">3</span>
-                    </div>
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <div class="p-3 border-bottom">
-                            <h6 class="mb-0">Notifications</h6>
-                        </div>
-                        <div class="notification-item unread">
-                            <div class="fw-bold">Assignment Due Soon</div>
-                            <div class="text-muted small">Database Project due in 2 days</div>
-                        </div>
-                        <div class="notification-item unread">
-                            <div class="fw-bold">New Peer Review</div>
-                            <div class="text-muted small">Review assignment from John Doe</div>
-                        </div>
-                        <div class="notification-item">
-                            <div class="fw-bold">Grade Posted</div>
-                            <div class="text-muted small">Your Web Development assignment has been graded</div>
-                        </div>
-                    </div>
+    <div class="login-container" id="loginContainer">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <h4>e-Learning System</h4>
+            </div>
+            <h5 class="text-center mb-4">Welcome back!</h5>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label" for="username">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
                 </div>
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle me-1"></i>
-                        <span id="currentUserName">John Doe</span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#profile"><i class="fas fa-user me-2"></i>Profile</a></li>
-                        <li><a class="dropdown-item" href="#settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                    </ul>
+                <div class="mb-4">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Login
+                </button>
+                <div class="text-center mt-3">
+                    <a href="#" class="text-muted small">Forgot Password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="app-container" id="appContainer">
+        <nav class="navbar navbar-expand-lg navbar-custom">
+            <div class="container-fluid">
+                <button class="btn btn-link text-white d-lg-none" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a class="navbar-brand" href="#dashboard">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    e-Learning System
+                </a>
+
+                <div class="navbar-nav ms-auto d-flex flex-row">
+                    <div class="nav-item dropdown me-3">
+                        <div class="notification-bell" id="notificationBell">
+                            <i class="fas fa-bell text-white fs-5"></i>
+                            <span class="notification-count" id="notificationCount">3</span>
+                        </div>
+                        <div class="notification-dropdown" id="notificationDropdown">
+                            <div class="p-3 border-bottom">
+                                <h6 class="mb-0">Notifications</h6>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="fw-bold">Assignment Due Soon</div>
+                                <div class="text-muted small">Database Project due in 2 days</div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="fw-bold">New Peer Review</div>
+                                <div class="text-muted small">Review assignment from John Doe</div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="fw-bold">Grade Posted</div>
+                                <div class="text-muted small">Your Web Development assignment has been graded</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span id="currentUserName">John Doe</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#profile" onclick="navigateTo('profile')"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="#settings" onclick="navigateTo('settings')"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <aside class="sidebar" id="sidebar">
-        <ul class="sidebar-menu" id="sidebarMenu">
-            </ul>
-    </aside>
+        <aside class="sidebar" id="sidebar">
+            <ul class="sidebar-menu" id="sidebarMenu">
+                </ul>
+        </aside>
 
-    <main class="main-content" id="mainContent">
-        <div class="container-fluid">
-            <div id="pageContent"></div>
-        </div>
-    </main>
+        <main class="main-content" id="mainContent">
+            <div class="container-fluid">
+                <div id="pageContent"></div>
+            </div>
+        </main>
+    </div>
 
     <div class="modal fade" id="submissionModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -860,34 +950,76 @@
 
     <script>
         // ========== GLOBAL VARIABLES ========== 
-        let currentUser = {
-            id: 1,
-            name: 'John Doe',
-            role: 'student', // Can be 'admin', 'instructor', 'student'
-            email: 'john.doe@example.com',
-            points: 150
-        };
-
+        let currentUser = null; // Changed to null initially
         let currentPage = 'dashboard';
         let notifications = [];
 
         // ========== PAGE INITIALIZATION ========== 
         document.addEventListener('DOMContentLoaded', function() {
-            initializeApp();
-            loadSidebarMenu();
-            loadDashboard();
+            // Initial state: show login page
+            showLoginPage();
             initializeEventListeners();
         });
 
         function initializeApp() {
+            // Show main application
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+
             // Set user name in navbar
             document.getElementById('currentUserName').textContent = currentUser.name;
+            
+            loadSidebarMenu();
+            loadDashboard();
 
             // Initialize tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
+        }
+
+        function showLoginPage() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+        }
+
+        // ========== LOGIN & LOGOUT LOGIC ==========
+        function handleLogin(event) {
+            event.preventDefault(); // Prevent form from submitting normally
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // This is a simple placeholder for demonstration.
+            // In a real application, you would send this to a backend for authentication.
+            if (username === 'student' && password === 'password') {
+                currentUser = {
+                    id: 1,
+                    name: 'John Doe',
+                    role: 'student',
+                    email: 'john.doe@example.com',
+                    points: 150
+                };
+                initializeApp();
+            } else if (username === 'instructor' && password === 'password') {
+                currentUser = {
+                    id: 2,
+                    name: 'Dr. Jane Smith',
+                    role: 'instructor',
+                    email: 'jane.smith@example.com',
+                    points: 300
+                };
+                initializeApp();
+            } else {
+                showAlert('Invalid username or password.', 'danger');
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            showLoginPage();
+            showAlert('You have been logged out.', 'info');
         }
 
         // ========== SIDEBAR MENU MANAGEMENT ========== 
@@ -2019,6 +2151,12 @@
 
         // ========== EVENT LISTENERS ========== 
         function initializeEventListeners() {
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Logout button click
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
             // Sidebar toggle
             document.getElementById('sidebarToggle').addEventListener('click', function() {
                 const sidebar = document.getElementById('sidebar');
@@ -2132,7 +2270,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
 
-            const container = document.querySelector('.container-fluid');
+            const container = document.getElementById('loginContainer').style.display === 'flex' ? document.getElementById('loginContainer') : document.querySelector('.container-fluid');
             container.insertBefore(alertDiv, container.firstChild);
 
             setTimeout(() => {
@@ -2205,6 +2343,5 @@
             }
         });
     </script>
-    
 </body>
 </html>

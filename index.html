@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive e-Learning & Peer Review System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* ========== GLOBAL STYLES ========== */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --sidebar-width: 250px;
+            --header-height: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        /* ========== NAVIGATION & LAYOUT ========== */
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: var(--header-height);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: white !important;
+            font-size: 1.4rem;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            height: calc(100vh - var(--header-height));
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid #e9ecef;
+            overflow-y: auto;
+            z-index: 999;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .sidebar-menu li {
+            margin: 5px 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: var(--light-color);
+            color: var(--primary-color);
+            border-left-color: var(--secondary-color);
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* ========== CARDS & COMPONENTS ========== */
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, var(--secondary-color), #74b9ff);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stats-card.success {
+            background: linear-gradient(135deg, var(--success-color), #00b894);
+        }
+
+        .stats-card.warning {
+            background: linear-gradient(135deg, var(--warning-color), #fdcb6e);
+        }
+
+        .stats-card.danger {
+            background: linear-gradient(135deg, var(--danger-color), #fd79a8);
+        }
+
+        .stats-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* ========== FORMS ========== */
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color), #74b9ff);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #00b894);
+            border: none;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #fd79a8);
+            border: none;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        /* ========== TABLES ========== */
+        .table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .table thead th {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 15px;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f8f9fa;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* ========== BADGES & ALERTS ========== */
+        .badge {
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 15px 20px;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(0, 184, 148, 0.1));
+            color: var(--success-color);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(253, 121, 168, 0.1));
+            color: var(--danger-color);
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.1), rgba(253, 203, 110, 0.1));
+            color: var(--warning-color);
+        }
+
+        /* ========== PROGRESS BARS ========== */
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        /* ========== MODAL STYLES ========== */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+
+        /* ========== ASSIGNMENT & COURSE STYLES ========== */
+        .course-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .course-header {
+            background: linear-gradient(135deg, var(--secondary-color), #74b9ff);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        .course-header h5 {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .course-code {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .assignment-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--secondary-color);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .assignment-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .assignment-due {
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .assignment-due.soon {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* ========== PEER REVIEW STYLES ========== */
+        .review-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+
+        .review-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .review-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .review-status.completed {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .review-criteria {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            margin: 0 5px;
+        }
+
+        /* ========== FORUM STYLES ========== */
+        .forum-post {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--secondary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .forum-post.reply {
+            margin-left: 30px;
+            border-left-color: #95a5a6;
+        }
+
+        .post-author {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .post-meta {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .vote-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .vote-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 5px 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vote-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+
+        /* ========== NOTIFICATION STYLES ========== */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+        }
+
+        .notification-item {
+            padding: 15px;
+            border-bottom: 1px solid #f1f1f1;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background: #e3f2fd;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .notification-dropdown {
+                width: 300px;
+                right: -100px;
+            }
+
+            .course-card {
+                margin-bottom: 15px;
+            }
+
+            .stats-card h3 {
+                font-size: 2rem;
+            }
+        }
+
+        /* ========== LOADING ANIMATIONS ========== */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== ACHIEVEMENT STYLES ========== */
+        .achievement-badge {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 1.5rem;
+            color: #8b4513;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .rank-number {
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .rank-number.first {
+            background: #ffd700;
+            color: #8b4513;
+        }
+
+        .rank-number.second {
+            background: #c0c0c0;
+            color: #333;
+        }
+
+        .rank-number.third {
+            background: #cd7f32;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <button class="btn btn-link text-white d-lg-none" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="#dashboard">
+                <i class="fas fa-graduation-cap me-2"></i>
+                e-Learning System
+            </a>
+
+            <div class="navbar-nav ms-auto d-flex flex-row">
+                <div class="nav-item dropdown me-3">
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="fas fa-bell text-white fs-5"></i>
+                        <span class="notification-count" id="notificationCount">3</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="p-3 border-bottom">
+                            <h6 class="mb-0">Notifications</h6>
+                        </div>
+                        <div class="notification-item unread">
+                            <div class="fw-bold">Assignment Due Soon</div>
+                            <div class="text-muted small">Database Project due in 2 days</div>
+                        </div>
+                        <div class="notification-item unread">
+                            <div class="fw-bold">New Peer Review</div>
+                            <div class="text-muted small">Review assignment from John Doe</div>
+                        </div>
+                        <div class="notification-item">
+                            <div class="fw-bold">Grade Posted</div>
+                            <div class="text-muted small">Your Web Development assignment has been graded</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i>
+                        <span id="currentUserName">John Doe</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#profile"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="#settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="sidebar" id="sidebar">
+        <ul class="sidebar-menu" id="sidebarMenu">
+            </ul>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid">
+            <div id="pageContent"></div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="submissionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Submit Assignment</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="submissionForm">
+                        <div class="mb-3">
+                            <label class="form-label">Assignment Text</label>
+                            <textarea class="form-control" rows="6" placeholder="Enter your assignment text here..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload File</label>
+                            <input type="file" class="form-control" accept=".pdf,.doc,.docx,.txt">
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Make sure your submission follows the assignment guidelines. Late submissions may be penalized.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Submit Assignment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="peerReviewModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Peer Review</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6>Submission to Review:</h6>
+                        <div class="bg-light p-3 rounded">
+                            <p>This is the assignment submission that you need to review. Please read it carefully and provide constructive feedback.</p>
+                        </div>
+                    </div>
+
+                    <form id="peerReviewForm">
+                        <div class="review-criteria">
+                            <h6>Review Criteria</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Content Quality (25%)</label>
+                                    <select class="form-select">
+                                        <option value="">Select rating...</option>
+                                        <option value="5">Excellent (5)</option>
+                                        <option value="4">Good (4)</option>
+                                        <option value="3">Average (3)</option>
+                                        <option value="2">Below Average (2)</option>
+                                        <option value="1">Poor (1)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Organization (25%)</label>
+                                    <select class="form-select">
+                                        <option value="">Select rating...</option>
+                                        <option value="5">Excellent (5)</option>
+                                        <option value="4">Good (4)</option>
+                                        <option value="3">Average (3)</option>
+                                        <option value="2">Below Average (2)</option>
+                                        <option value="1">Poor (1)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Clarity (25%)</label>
+                                    <select class="form-select">
+                                        <option value="">Select rating...</option>
+                                        <option value="5">Excellent (5)</option>
+                                        <option value="4">Good (4)</option>
+                                        <option value="3">Average (3)</option>
+                                        <option value="2">Below Average (2)</option>
+                                        <option value="1">Poor (1)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Completeness (25%)</label>
+                                    <select class="form-select">
+                                        <option value="">Select rating...</option>
+                                        <option value="5">Excellent (5)</option>
+                                        <option value="4">Good (4)</option>
+                                        <option value="3">Average (3)</option>
+                                        <option value="2">Below Average (2)</option>
+                                        <option value="1">Poor (1)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Overall Feedback</label>
+                            <textarea class="form-control" rows="4" placeholder="Provide detailed, constructive feedback..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Suggestions for Improvement</label>
+                            <textarea class="form-control" rows="3" placeholder="What could be improved?"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success">Submit Review</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="courseModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Course</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="courseForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label class="form-label">Course Title</label>
+                                <input type="text" class="form-control" placeholder="Enter course title">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Course Code</label>
+                                <input type="text" class="form-control" placeholder="e.g., CS101">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" rows="4" placeholder="Course description"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Category</label>
+                                <select class="form-select">
+                                    <option value="">Select category</option>
+                                    <option value="computer-science">Computer Science</option>
+                                    <option value="mathematics">Mathematics</option>
+                                    <option value="physics">Physics</option>
+                                    <option value="chemistry">Chemistry</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Max Enrollment</label>
+                                <input type="number" class="form-control" placeholder="50">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" class="form-control">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Create Course</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // ========== GLOBAL VARIABLES ========== 
+        let currentUser = {
+            id: 1,
+            name: 'John Doe',
+            role: 'student', // Can be 'admin', 'instructor', 'student'
+            email: 'john.doe@example.com',
+            points: 150
+        };
+
+        let currentPage = 'dashboard';
+        let notifications = [];
+
+        // ========== PAGE INITIALIZATION ========== 
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            loadSidebarMenu();
+            loadDashboard();
+            initializeEventListeners();
+        });
+
+        function initializeApp() {
+            // Set user name in navbar
+            document.getElementById('currentUserName').textContent = currentUser.name;
+
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
+
+        // ========== SIDEBAR MENU MANAGEMENT ========== 
+        function loadSidebarMenu() {
+            const menuItems = getMenuItemsByRole(currentUser.role);
+            const sidebarMenu = document.getElementById('sidebarMenu');
+
+            sidebarMenu.innerHTML = menuItems.map(item => `
+                <li>
+                    <a href="#${item.page}" class="${item.page === currentPage ? 'active' : ''}" 
+                       onclick="navigateTo('${item.page}')">
+                        <i class="${item.icon}"></i>
+                        <span>${item.label}</span>
+                    </a>
+                </li>
+            `).join('');
+        }
+
+        function getMenuItemsByRole(role) {
+            const commonItems = [
+                { page: 'dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
+                { page: 'profile', label: 'Profile', icon: 'fas fa-user' }
+            ];
+
+            const roleSpecificItems = {
+                admin: [
+                    { page: 'users', label: 'Manage Users', icon: 'fas fa-users' },
+                    { page: 'courses', label: 'All Courses', icon: 'fas fa-book' },
+                    { page: 'analytics', label: 'Analytics', icon: 'fas fa-chart-line' },
+                    { page: 'settings', label: 'System Settings', icon: 'fas fa-cog' }
+                ],
+                instructor: [
+                    { page: 'my-courses', label: 'My Courses', icon: 'fas fa-chalkboard-teacher' },
+                    { page: 'create-course', label: 'Create Course', icon: 'fas fa-plus-circle' },
+                    { page: 'assignments', label: 'Assignments', icon: 'fas fa-tasks' },
+                    { page: 'peer-reviews', label: 'Peer Reviews', icon: 'fas fa-user-friends' },
+                    { page: 'gradebook', label: 'Gradebook', icon: 'fas fa-clipboard-list' }
+                ],
+                student: [
+                    { page: 'my-courses', label: 'My Courses', icon: 'fas fa-book-open' },
+                    { page: 'assignments', label: 'Assignments', icon: 'fas fa-file-alt' },
+                    { page: 'peer-reviews', label: 'Peer Reviews', icon: 'fas fa-users' },
+                    { page: 'forums', label: 'Discussion Forums', icon: 'fas fa-comments' },
+                    { page: 'achievements', label: 'Achievements', icon: 'fas fa-trophy' }
+                ]
+            };
+
+            return [...commonItems, ...roleSpecificItems[role]];
+        }
+
+        // ========== NAVIGATION ========== 
+        function navigateTo(page) {
+            currentPage = page;
+            updateActiveMenuItem();
+            loadPageContent(page);
+        }
+
+        function updateActiveMenuItem() {
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentPage}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        function loadPageContent(page) {
+            const pageContent = document.getElementById('pageContent');
+            pageContent.innerHTML = '<div class="spinner"></div>';
+
+            setTimeout(() => {
+                switch(page) {
+                    case 'dashboard':
+                        loadDashboard();
+                        break;
+                    case 'my-courses':
+                        loadMyCourses();
+                        break;
+                    case 'assignments':
+                        loadAssignments();
+                        break;
+                    case 'peer-reviews':
+                        loadPeerReviews();
+                        break;
+                    case 'forums':
+                        loadForums();
+                        break;
+                    case 'achievements':
+                        loadAchievements();
+                        break;
+                    case 'profile':
+                        loadProfile();
+                        break;
+                    case 'create-course':
+                        loadCreateCourse();
+                        break;
+                    case 'analytics':
+                        loadAnalytics();
+                        break;
+                    default:
+                        loadDashboard();
+                }
+            }, 500);
+        }
+
+        // ========== PAGE CONTENT LOADERS ========== 
+        function loadDashboard() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="fade-in">Welcome back, ${currentUser.name}!</h2>
+                        <p class="text-muted">Here's what's happening in your courses today.</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card">
+                            <h3>4</h3>
+                            <p>Active Courses</p>
+                            <i class="fas fa-book-open position-absolute" style="top: 15px; right: 15px; opacity: 0.3; font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card warning">
+                            <h3>3</h3>
+                            <p>Pending Assignments</p>
+                            <i class="fas fa-clock position-absolute" style="top: 15px; right: 15px; opacity: 0.3; font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card success">
+                            <h3>2</h3>
+                            <p>Peer Reviews</p>
+                            <i class="fas fa-users position-absolute" style="top: 15px; right: 15px; opacity: 0.3; font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card danger">
+                            <h3>${currentUser.points}</h3>
+                            <p>Total Points</p>
+                            <i class="fas fa-star position-absolute" style="top: 15px; right: 15px; opacity: 0.3; font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Assignments</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="assignment-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6>Database Design Project</h6>
+                                            <p class="text-muted mb-1">CS 301 - Database Systems</p>
+                                            <span class="assignment-due soon">Due in 2 days</span>
+                                        </div>
+                                        <button class="btn btn-primary btn-sm" onclick="openSubmissionModal()">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="assignment-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6>React Components Analysis</h6>
+                                            <p class="text-muted mb-1">CS 405 - Web Development</p>
+                                            <span class="assignment-due">Due in 5 days</span>
+                                        </div>
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="assignment-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6>Algorithm Complexity Report</h6>
+                                            <p class="text-muted mb-1">CS 302 - Data Structures</p>
+                                            <span class="assignment-due">Due in 1 week</span>
+                                        </div>
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            View Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Recent Achievements</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <div class="achievement-badge">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <h6>Assignment Master</h6>
+                                <p class="text-muted small">Submitted 10 assignments on time</p>
+                                <hr>
+                                <div class="achievement-badge">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h6>Peer Reviewer</h6>
+                                <p class="text-muted small">Completed 5 peer reviews</p>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Progress Overview</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Database Systems</span>
+                                        <span>85%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Web Development</span>
+                                        <span>72%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-info" style="width: 72%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Data Structures</span>
+                                        <span>90%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: 90%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadMyCourses() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>My Courses</h2>
+                        <p class="text-muted">Manage your enrolled courses and track your progress.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <div class="course-header">
+                                <div class="course-code">CS 301</div>
+                                <h5>Database Systems</h5>
+                                <p class="mb-0">Dr. Sarah Johnson</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Progress</span>
+                                        <span>85%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span><i class="fas fa-users me-1"></i> 45 students</span>
+                                    <span><i class="fas fa-calendar me-1"></i> 12 weeks</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary btn-sm flex-fill">Enter Course</button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-chart-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <div class="course-header">
+                                <div class="course-code">CS 405</div>
+                                <h5>Web Development</h5>
+                                <p class="mb-0">Prof. Michael Chen</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Progress</span>
+                                        <span>72%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-info" style="width: 72%"></div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span><i class="fas fa-users me-1"></i> 38 students</span>
+                                    <span><i class="fas fa-calendar me-1"></i> 10 weeks</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary btn-sm flex-fill">Enter Course</button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-chart-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4 col-md-6">
+                        <div class="course-card">
+                            <div class="course-header">
+                                <div class="course-code">CS 302</div>
+                                <h5>Data Structures</h5>
+                                <p class="mb-0">Dr. Emily Rodriguez</p>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span>Progress</span>
+                                        <span>90%</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width: 90%"></div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span><i class="fas fa-users me-1"></i> 52 students</span>
+                                    <span><i class="fas fa-calendar me-1"></i> 14 weeks</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary btn-sm flex-fill">Enter Course</button>
+                                    <button class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-chart-line"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadAssignments() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Assignments</h2>
+                        <p class="text-muted">View and manage your assignment submissions.</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Search assignments...">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select">
+                            <option value="">All Courses</option>
+                            <option value="cs301">Database Systems</option>
+                            <option value="cs405">Web Development</option>
+                            <option value="cs302">Data Structures</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Assignment</th>
+                                        <th>Course</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Grade</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <strong>Database Design Project</strong>
+                                            <br><small class="text-muted">Design and implement a relational database</small>
+                                        </td>
+                                        <td>CS 301</td>
+                                        <td>
+                                            <span class="text-danger">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Sep 22, 2025
+                                            </span>
+                                        </td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td>-</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="openSubmissionModal()">
+                                                Submit
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>React Components Analysis</strong>
+                                            <br><small class="text-muted">Analyze and document React component lifecycle</small>
+                                        </td>
+                                        <td>CS 405</td>
+                                        <td>Sep 25, 2025</td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                        <td>-</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm">Submit</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Binary Tree Implementation</strong>
+                                            <br><small class="text-muted">Implement various binary tree operations</small>
+                                        </td>
+                                        <td>CS 302</td>
+                                        <td>Sep 15, 2025</td>
+                                        <td><span class="badge bg-success">Submitted</span></td>
+                                        <td><strong>88/100</strong></td>
+                                        <td>
+                                            <button class="btn btn-outline-secondary btn-sm">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>SQL Query Optimization</strong>
+                                            <br><small class="text-muted">Optimize given SQL queries for performance</small>
+                                        </td>
+                                        <td>CS 301</td>
+                                        <td>Sep 10, 2025</td>
+                                        <td><span class="badge bg-info">Graded</span></td>
+                                        <td><strong>92/100</strong></td>
+                                        <td>
+                                            <button class="btn btn-outline-secondary btn-sm">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadPeerReviews() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Peer Reviews</h2>
+                        <p class="text-muted">Review your peers' work and view reviews of your submissions.</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="nav nav-pills" role="tablist">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#to-review">
+                                To Review (2)
+                            </button>
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#my-reviews">
+                                My Reviews (5)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="to-review">
+                        <div class="review-card">
+                            <div class="review-status pending">Pending Review</div>
+                            <h6>Database Design Project - Anonymous Submission</h6>
+                            <p class="text-muted">CS 301 - Database Systems</p>
+                            <p>Review this student's database design and provide constructive feedback on their ER diagram and normalization approach.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Due: Sep 24, 2025</small>
+                                <button class="btn btn-success btn-sm" onclick="openPeerReviewModal()">
+                                    Start Review
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="review-card">
+                            <div class="review-status pending">Pending Review</div>
+                            <h6>React Components Analysis - Anonymous Submission</h6>
+                            <p class="text-muted">CS 405 - Web Development</p>
+                            <p>Evaluate the component lifecycle analysis and provide feedback on the documentation quality.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Due: Sep 27, 2025</small>
+                                <button class="btn btn-success btn-sm">Start Review</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="my-reviews">
+                        <div class="review-card">
+                            <div class="review-status completed">Completed</div>
+                            <h6>Binary Tree Implementation Review</h6>
+                            <p class="text-muted">CS 302 - Data Structures</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Your Rating:</strong>
+                                    <div class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="far fa-star"></i>
+                                        <span class="ms-2">4.0/5.0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Reviewed on: Sep 16, 2025</small>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-outline-secondary btn-sm">View Details</button>
+                            </div>
+                        </div>
+
+                        <div class="review-card">
+                            <div class="review-status completed">Completed</div>
+                            <h6>SQL Query Optimization Review</h6>
+                            <p class="text-muted">CS 301 - Database Systems</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Your Rating:</strong>
+                                    <div class="rating-stars">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <span class="ms-2">5.0/5.0</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Reviewed on: Sep 12, 2025</small>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-outline-secondary btn-sm">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadForums() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Discussion Forums</h2>
+                        <p class="text-muted">Engage with your classmates and instructors in course discussions.</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Search discussions...">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>New Discussion
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forum-post">
+                    <div class="post-meta">
+                        <span class="post-author">Dr. Sarah Johnson</span> • 
+                        <span>CS 301 - Database Systems</span> • 
+                        <span>2 hours ago</span>
+                        <span class="badge bg-success ms-2">Instructor</span>
+                    </div>
+                    <h6>Database Normalization Best Practices</h6>
+                    <p>I wanted to share some additional resources on database normalization that might help with your upcoming project. Remember that the goal is to reduce redundancy while maintaining data integrity...</p>
+                    <div class="vote-buttons">
+                        <button class="vote-btn">
+                            <i class="fas fa-thumbs-up me-1"></i> 15
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-reply me-1"></i> Reply
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-share me-1"></i> Share
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forum-post reply">
+                    <div class="post-meta">
+                        <span class="post-author">Alice Smith</span> • 
+                        <span>1 hour ago</span>
+                    </div>
+                    <p>Thank you for sharing this! I was struggling with understanding when to use 3NF vs BCNF. The examples you provided really helped clarify the concepts.</p>
+                    <div class="vote-buttons">
+                        <button class="vote-btn">
+                            <i class="fas fa-thumbs-up me-1"></i> 8
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-reply me-1"></i> Reply
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forum-post">
+                    <div class="post-meta">
+                        <span class="post-author">Mike Chen</span> • 
+                        <span>CS 405 - Web Development</span> • 
+                        <span>4 hours ago</span>
+                    </div>
+                    <h6>React Hooks vs Class Components</h6>
+                    <p>Can someone explain when it's better to use React Hooks versus Class Components? I'm working on the assignment and not sure which approach to take for my component architecture.</p>
+                    <div class="vote-buttons">
+                        <button class="vote-btn">
+                            <i class="fas fa-thumbs-up me-1"></i> 12
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-reply me-1"></i> Reply
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-share me-1"></i> Share
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forum-post reply">
+                    <div class="post-meta">
+                        <span class="post-author">Prof. Michael Chen</span> • 
+                        <span>3 hours ago</span>
+                        <span class="badge bg-success ms-2">Instructor</span>
+                    </div>
+                    <p>Great question! In modern React development, Hooks are generally preferred for new components. They offer better performance, cleaner code, and easier testing. I'll post some examples in the course materials.</p>
+                    <div class="vote-buttons">
+                        <button class="vote-btn">
+                            <i class="fas fa-thumbs-up me-1"></i> 18
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-reply me-1"></i> Reply
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forum-post">
+                    <div class="post-meta">
+                        <span class="post-author">Emily Rodriguez</span> • 
+                        <span>CS 302 - Data Structures</span> • 
+                        <span>6 hours ago</span>
+                    </div>
+                    <h6>Binary Tree Traversal Algorithms</h6>
+                    <p>I implemented all three traversal methods (inorder, preorder, postorder) but I'm getting different results than expected. Has anyone else encountered this issue?</p>
+                    <div class="vote-buttons">
+                        <button class="vote-btn">
+                            <i class="fas fa-thumbs-up me-1"></i> 6
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-reply me-1"></i> Reply
+                        </button>
+                        <button class="vote-btn">
+                            <i class="fas fa-share me-1"></i> Share
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadAchievements() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Achievements & Leaderboard</h2>
+                        <p class="text-muted">Track your progress and see how you compare with your peers.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Your Achievements</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 text-center mb-4">
+                                        <div class="achievement-badge">
+                                            <i class="fas fa-medal"></i>
+                                        </div>
+                                        <h6>Assignment Master</h6>
+                                        <p class="text-muted small">Submitted 10 assignments on time</p>
+                                        <span class="badge bg-success">Earned</span>
+                                    </div>
+                                    <div class="col-md-4 text-center mb-4">
+                                        <div class="achievement-badge">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <h6>Peer Reviewer</h6>
+                                        <p class="text-muted small">Completed 5 peer reviews</p>
+                                        <span class="badge bg-success">Earned</span>
+                                    </div>
+                                    <div class="col-md-4 text-center mb-4">
+                                        <div class="achievement-badge" style="opacity: 0.5;">
+                                            <i class="fas fa-crown"></i>
+                                        </div>
+                                        <h6>Discussion Leader</h6>
+                                        <p class="text-muted small">Start 10 forum discussions</p>
+                                        <span class="badge bg-secondary">3/10</span>
+                                    </div>
+                                    <div class="col-md-4 text-center mb-4">
+                                        <div class="achievement-badge" style="opacity: 0.5;">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <h6>Grade Excellence</h6>
+                                        <p class="text-muted small">Maintain 90+ average grade</p>
+                                        <span class="badge bg-secondary">85%</span>
+                                    </div>
+                                    <div class="col-md-4 text-center mb-4">
+                                        <div class="achievement-badge">
+                                            <i class="fas fa-comments"></i>
+                                        </div>
+                                        <h6>Community Helper</h6>
+                                        <p class="text-muted small">Help 20 students in forums</p>
+                                        <span class="badge bg-success">Earned</span>
+                                    </div>
+                                    <div class="col-md-4 text-center mb-4">
+                                        <div class="achievement-badge" style="opacity: 0.5;">
+                                            <i class="fas fa-graduation-cap"></i>
+                                        </div>
+                                        <h6>Course Completer</h6>
+                                        <p class="text-muted small">Complete 5 courses</p>
+                                        <span class="badge bg-secondary">2/5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Leaderboard</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="leaderboard-item">
+                                    <div class="rank-number first">1</div>
+                                    <div class="flex-grow-1">
+                                        <strong>Sarah Wilson</strong>
+                                        <div class="text-muted small">285 points</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <i class="fas fa-crown text-warning"></i>
+                                    </div>
+                                </div>
+
+                                <div class="leaderboard-item">
+                                    <div class="rank-number second">2</div>
+                                    <div class="flex-grow-1">
+                                        <strong>Alex Kim</strong>
+                                        <div class="text-muted small">270 points</div>
+                                    </div>
+                                </div>
+
+                                <div class="leaderboard-item">
+                                    <div class="rank-number third">3</div>
+                                    <div class="flex-grow-1">
+                                        <strong>Maria Garcia</strong>
+                                        <div class="text-muted small">255 points</div>
+                                    </div>
+                                </div>
+
+                                <div class="leaderboard-item" style="background: #e3f2fd;">
+                                    <div class="rank-number">4</div>
+                                    <div class="flex-grow-1">
+                                        <strong>You (John Doe)</strong>
+                                        <div class="text-muted small">${currentUser.points} points</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <i class="fas fa-user text-primary"></i>
+                                    </div>
+                                </div>
+
+                                <div class="leaderboard-item">
+                                    <div class="rank-number">5</div>
+                                    <div class="flex-grow-1">
+                                        <strong>David Lee</strong>
+                                        <div class="text-muted small">140 points</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Points Breakdown</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Assignments</span>
+                                    <strong>80 pts</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Peer Reviews</span>
+                                    <strong>35 pts</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Forum Participation</span>
+                                    <strong>20 pts</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Quizzes</span>
+                                    <strong>15 pts</strong>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <strong>Total Points</strong>
+                                    <strong>${currentUser.points} pts</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadProfile() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Profile Settings</h2>
+                        <p class="text-muted">Manage your account information and preferences.</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <img src="https://via.placeholder.com/120x120/3498db/ffffff?text=JD" 
+                                         class="rounded-circle" alt="Profile Picture" width="120" height="120">
+                                </div>
+                                <h5>${currentUser.name}</h5>
+                                <p class="text-muted">${currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1)}</p>
+                                <p class="text-muted">${currentUser.email}</p>
+                                <button class="btn btn-primary">Change Photo</button>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Statistics</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Points</span>
+                                    <strong>${currentUser.points}</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Assignments Submitted</span>
+                                    <strong>12</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Peer Reviews</span>
+                                    <strong>8</strong>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Forum Posts</span>
+                                    <strong>15</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Personal Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">First Name</label>
+                                            <input type="text" class="form-control" value="John">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" value="Doe">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" value="john.doe@example.com">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Bio</label>
+                                        <textarea class="form-control" rows="3" placeholder="Tell us about yourself..."></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Security Settings</h6>
+                            </div>
+                            <div class="card-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">Current Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirm New Password</label>
+                                        <input type="password" class="form-control">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Notification Preferences</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="emailNotif" checked>
+                                    <label class="form-check-label" for="emailNotif">
+                                        Email notifications for assignments
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="reviewNotif" checked>
+                                    <label class="form-check-label" for="reviewNotif">
+                                        Peer review notifications
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="forumNotif">
+                                    <label class="form-check-label" for="forumNotif">
+                                        Forum reply notifications
+                                    </label>
+                                </div>
+                                <button class="btn btn-primary">Save Preferences</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadCreateCourse() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Create New Course</h2>
+                        <p class="text-muted">Set up a new course with lessons, assignments, and peer review activities.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label class="form-label">Course Title</label>
+                                    <input type="text" class="form-control" placeholder="Enter course title">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Course Code</label>
+                                    <input type="text" class="form-control" placeholder="e.g., CS101">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" rows="4" placeholder="Course description and objectives"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Category</label>
+                                    <select class="form-select">
+                                        <option value="">Select category</option>
+                                        <option value="computer-science">Computer Science</option>
+                                        <option value="mathematics">Mathematics</option>
+                                        <option value="physics">Physics</option>
+                                        <option value="chemistry">Chemistry</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Max Enrollment</label>
+                                    <input type="number" class="form-control" placeholder="50" value="50">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Enrollment Deadline</label>
+                                    <input type="date" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">Create Course</button>
+                                <button type="button" class="btn btn-secondary">Save as Draft</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+        }
+
+        function loadAnalytics() {
+            const content = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2>Analytics Dashboard</h2>
+                        <p class="text-muted">System-wide analytics and performance metrics.</p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card">
+                            <h3>1,247</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card success">
+                            <h3>45</h3>
+                            <p>Active Courses</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card warning">
+                            <h3>328</h3>
+                            <p>Assignments</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stats-card danger">
+                            <h3>892</h3>
+                            <p>Peer Reviews</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">User Activity Overview</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="activityChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Course Completion Rates</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="completionChart" width="200" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('pageContent').innerHTML = content;
+
+            // Initialize charts if on analytics page
+            setTimeout(() => {
+                if (currentPage === 'analytics') {
+                    initializeCharts();
+                }
+            }, 100);
+        }
+
+        // ========== EVENT LISTENERS ========== 
+        function initializeEventListeners() {
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+                sidebar.classList.toggle('show');
+                mainContent.classList.toggle('expanded');
+            });
+
+            // Notification bell
+            document.getElementById('notificationBell').addEventListener('click', function() {
+                const dropdown = document.getElementById('notificationDropdown');
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            // Close notification dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                const bell = document.getElementById('notificationBell');
+                const dropdown = document.getElementById('notificationDropdown');
+                if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+
+            // Handle responsive sidebar
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    document.getElementById('sidebar').classList.remove('show');
+                    document.getElementById('mainContent').classList.remove('expanded');
+                }
+            });
+        }
+
+        // ========== MODAL FUNCTIONS ========== 
+        function openSubmissionModal() {
+            const modal = new bootstrap.Modal(document.getElementById('submissionModal'));
+            modal.show();
+        }
+
+        function openPeerReviewModal() {
+            const modal = new bootstrap.Modal(document.getElementById('peerReviewModal'));
+            modal.show();
+        }
+
+        function openCourseModal() {
+            const modal = new bootstrap.Modal(document.getElementById('courseModal'));
+            modal.show();
+        }
+
+        // ========== CHART INITIALIZATION ========== 
+        function initializeCharts() {
+            // Activity Chart
+            const activityCtx = document.getElementById('activityChart');
+            if (activityCtx) {
+                new Chart(activityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Active Users',
+                            data: [120, 190, 300, 250, 220, 330],
+                            borderColor: 'rgb(52, 152, 219)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Completion Chart
+            const completionCtx = document.getElementById('completionChart');
+            if (completionCtx) {
+                new Chart(completionCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'In Progress', 'Not Started'],
+                        datasets: [{
+                            data: [65, 25, 10],
+                            backgroundColor: [
+                                'rgb(39, 174, 96)',
+                                'rgb(243, 156, 18)',
+                                'rgb(231, 76, 60)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // ========== UTILITY FUNCTIONS ========== 
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const container = document.querySelector('.container-fluid');
+            container.insertBefore(alertDiv, container.firstChild);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function calculateTimeAgo(date) {
+            const now = new Date();
+            const past = new Date(date);
+            const diffInSeconds = Math.floor((now - past) / 1000);
+
+            const intervals = {
+                year: 31536000,
+                month: 2592000,
+                week: 604800,
+                day: 86400,
+                hour: 3600,
+                minute: 60
+            };
+
+            for (const [unit, seconds] of Object.entries(intervals)) {
+                const interval = Math.floor(diffInSeconds / seconds);
+                if (interval > 0) {
+                    return `${interval} ${unit}${interval > 1 ? 's' : ''} ago`;
+                }
+            }
+
+            return 'Just now';
+        }
+
+        // ========== AJAX FUNCTIONS (Placeholder) ========== 
+        async function submitAssignment(formData) {
+            // Placeholder for AJAX submission
+            showAlert('Assignment submitted successfully!', 'success');
+        }
+
+        async function submitPeerReview(reviewData) {
+            // Placeholder for AJAX submission
+            showAlert('Peer review submitted successfully!', 'success');
+        }
+
+        async function createCourse(courseData) {
+            // Placeholder for AJAX submission
+            showAlert('Course created successfully!', 'success');
+        }
+
+        // ========== KEYBOARD SHORTCUTS ========== 
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K for search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                const searchInput = document.querySelector('input[placeholder*="Search"]');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+
+            // Escape to close modals/dropdowns
+            if (e.key === 'Escape') {
+                document.getElementById('notificationDropdown').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
